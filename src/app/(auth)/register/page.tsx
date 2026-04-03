@@ -1,14 +1,13 @@
-```tsx
 "use client";
 
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import { auth, db } from "@/lib/firebase";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -17,10 +16,8 @@ export default function RegisterPage() {
   const [age, setAge] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("");
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -35,10 +32,7 @@ export default function RegisterPage() {
         password
       );
 
-      const user = userCredential.user;
-
-      // Save additional user details to Firestore
-      await setDoc(doc(db, "users", user.uid), {
+      await setDoc(doc(db, "users", userCredential.user.uid), {
         fullName,
         email,
         age,
@@ -47,8 +41,8 @@ export default function RegisterPage() {
       });
 
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to create account.");
     } finally {
       setLoading(false);
     }
@@ -103,9 +97,7 @@ export default function RegisterPage() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        {error && (
-          <p className="text-red-500 text-sm">{error}</p>
-        )}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
         <Button onClick={handleRegister}>
           {loading ? "Creating..." : "Register"}
@@ -124,4 +116,3 @@ export default function RegisterPage() {
     </main>
   );
 }
-```
